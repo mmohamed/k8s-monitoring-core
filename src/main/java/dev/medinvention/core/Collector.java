@@ -1,4 +1,4 @@
-package io.ext.medinvention.core;
+package dev.medinvention.core;
 
 import org.springframework.stereotype.Service;
 
