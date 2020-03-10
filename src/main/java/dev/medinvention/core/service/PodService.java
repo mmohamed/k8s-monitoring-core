@@ -18,42 +18,52 @@ public class PodService extends AbstractClient {
 
 	public List<Pod> get() throws ApiException {
 		List<Pod> pods = new ArrayList<Pod>();
-		
+
 		V1PodList list = this.getAPI().listPodForAllNamespaces(null, null, null, null, null, null, null, null, null);
-		
+
 		for (V1Pod item : list.getItems()) {
 			Pod pod = new Pod();
-			
+
 			List<String> images = new ArrayList<String>();
-			for(V1Container container : item.getSpec().getContainers()) {
-				images.add(container.getImage());
+
+			if (item.getSpec() != null) {
+				for (V1Container container : item.getSpec().getContainers()) {
+					images.add(container.getImage());
+				}
+
+				pod.setNode(item.getSpec().getNodeName());
 			}
-			
+
 			int ready = 0;
 			int all = 0;
 			int restart = 0;
-			for(V1ContainerStatus status : item.getStatus().getContainerStatuses()) {
-				if(status.getReady()) {
-					ready++;
+			if (item.getStatus() != null) {
+				for (V1ContainerStatus status : item.getStatus().getContainerStatuses()) {
+					if (status.getReady()) {
+						ready++;
+					}
+					all++;
+					restart = Math.max(restart, status.getRestartCount());
 				}
-				all++;
-				restart = Math.max(restart, status.getRestartCount());
+
+				pod.setStatus(item.getStatus().getPhase());
+				pod.setAddress(item.getStatus().getPodIP());
+				pod.setStartedAt(item.getStatus().getStartTime().toDate());
 			}
-				
-			pod.setName(item.getMetadata().getName());
-			pod.setNamespace(item.getMetadata().getNamespace());
-			pod.setStartedAt(item.getStatus().getStartTime().toDate());
-			pod.setStatus(item.getStatus().getPhase());
+
+			if (item.getMetadata() != null) {
+				pod.setName(item.getMetadata().getName());
+				pod.setNamespace(item.getMetadata().getNamespace());
+			}
+
 			pod.setImages(images);
-			pod.setNode(item.getSpec().getNodeName());
-			pod.setAddress(item.getStatus().getPodIP());
 			pod.setReadyContainers(ready);
 			pod.setAllContainers(all);
 			pod.setRestartCount(restart);
-			
+
 			pods.add(pod);
 		}
-		
+
 		return pods;
 	}
 }

@@ -25,22 +25,27 @@ public class NodeService extends AbstractClient {
 
 		for (V1Node item : list.getItems()) {
 
-			Map<String, Quantity> capacity = item.getStatus().getCapacity();
+			Node node = new Node();
 
 			String status = "NotReady";
 
-			for (V1NodeCondition condition : item.getStatus().getConditions()) {
-				if (condition.getType().contentEquals("Ready") && condition.getStatus().contentEquals("True")) {
-					status = "Ready";
-				}
-			}
+			if (item.getStatus() != null) {
 
-			Node node = new Node();
+				Map<String, Quantity> capacity = item.getStatus().getCapacity();
+
+				for (V1NodeCondition condition : item.getStatus().getConditions()) {
+					if (condition.getType().contentEquals("Ready") && condition.getStatus().contentEquals("True")) {
+						status = "Ready";
+					}
+				}
+
+				node.setMemory(capacity.containsKey("memory") ? capacity.get("memory").getNumber() : new BigDecimal(0));
+				node.setCpu(capacity.containsKey("cpu") ? capacity.get("cpu").getNumber() : new BigDecimal(0));
+
+			}
 
 			node.setName(item.getMetadata().getName());
 			node.setStatus(status);
-			node.setMemory(capacity.containsKey("memory") ? capacity.get("memory").getNumber() : new BigDecimal(0));
-			node.setCpu(capacity.containsKey("cpu") ? capacity.get("cpu").getNumber() : new BigDecimal(0));
 			node.setAddresse(item.getStatus().getAddresses().get(0).getAddress());
 
 			nodes.add(node);
