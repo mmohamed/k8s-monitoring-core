@@ -26,7 +26,7 @@ public class PodService extends AbstractClient {
 
 			List<String> images = new ArrayList<String>();
 
-			if (item.getSpec() != null) {
+			if (item.getSpec() != null && item.getSpec().getContainers() != null) {
 				for (V1Container container : item.getSpec().getContainers()) {
 					images.add(container.getImage());
 				}
@@ -37,18 +37,18 @@ public class PodService extends AbstractClient {
 			int ready = 0;
 			int all = 0;
 			int restart = 0;
-			if (item.getStatus() != null) {
+			if (item.getStatus() != null && item.getStatus().getContainerStatuses() != null) {
 				for (V1ContainerStatus status : item.getStatus().getContainerStatuses()) {
 					if (status.getReady()) {
 						ready++;
 					}
 					all++;
-					restart = Math.max(restart, status.getRestartCount());
+					restart = Math.max(restart, status.getRestartCount() != null ? status.getRestartCount() : 0);
 				}
 
 				pod.setStatus(item.getStatus().getPhase());
 				pod.setAddress(item.getStatus().getPodIP());
-				pod.setStartedAt(item.getStatus().getStartTime().toDate());
+				pod.setStartedAt(item.getStatus().getStartTime() != null ? item.getStatus().getStartTime().toDate() : null);
 			}
 
 			if (item.getMetadata() != null) {

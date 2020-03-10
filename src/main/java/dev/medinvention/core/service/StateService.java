@@ -22,12 +22,12 @@ public class StateService extends AbstractClient {
 		V1NodeList list = this.getAPI().listNode(null, null, null, null, null, null, null, null, null);
 
 		for (V1Node item : list.getItems()) {
-			if(item.getSpec() == null) {
+			if (item.getSpec() == null || item.getSpec().getTaints() == null) {
 				continue;
 			}
 			for (V1Taint taint : item.getSpec().getTaints()) {
 				if (taint.getKey().contentEquals("node-role.kubernetes.io/master")) {
-					if(item.getStatus() == null) {
+					if (item.getStatus() == null || item.getStatus().getConditions() == null) {
 						continue;
 					}
 					for (V1NodeCondition condition : item.getStatus().getConditions()) {

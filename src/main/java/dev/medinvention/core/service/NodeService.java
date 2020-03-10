@@ -19,6 +19,7 @@ import io.kubernetes.client.openapi.models.V1NodeList;
 public class NodeService extends AbstractClient {
 
 	public List<Node> get() throws ApiException {
+		
 		List<Node> nodes = new ArrayList<Node>();
 
 		V1NodeList list = this.getAPI().listNode(null, null, null, null, null, null, null, null, null);
@@ -31,22 +32,30 @@ public class NodeService extends AbstractClient {
 
 			if (item.getStatus() != null) {
 
-				Map<String, Quantity> capacity = item.getStatus().getCapacity();
-
-				for (V1NodeCondition condition : item.getStatus().getConditions()) {
-					if (condition.getType().contentEquals("Ready") && condition.getStatus().contentEquals("True")) {
-						status = "Ready";
+				if (item.getStatus().getConditions() != null) {
+					for (V1NodeCondition condition : item.getStatus().getConditions()) {
+						if (condition.getType() != null && condition.getStatus() != null
+								&& condition.getType().contentEquals("Ready")
+								&& condition.getStatus().contentEquals("True")) {
+							status = "Ready";
+						}
 					}
 				}
 
-				node.setMemory(capacity.containsKey("memory") ? capacity.get("memory").getNumber() : new BigDecimal(0));
-				node.setCpu(capacity.containsKey("cpu") ? capacity.get("cpu").getNumber() : new BigDecimal(0));
+				Map<String, Quantity> capacity = item.getStatus().getCapacity();
 
+				if (capacity != null) {
+					node.setMemory(
+							capacity.containsKey("memory") ? capacity.get("memory").getNumber() : new BigDecimal(0));
+					node.setCpu(capacity.containsKey("cpu") ? capacity.get("cpu").getNumber() : new BigDecimal(0));
+				}
 			}
 
 			node.setName(item.getMetadata().getName());
 			node.setStatus(status);
-			node.setAddresse(item.getStatus().getAddresses().get(0).getAddress());
+			node.setAddresse(
+					item.getStatus().getAddresses() != null ? item.getStatus().getAddresses().get(0).getAddress()
+							: null);
 
 			nodes.add(node);
 		}
