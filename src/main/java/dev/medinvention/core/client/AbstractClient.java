@@ -18,6 +18,8 @@ abstract public class AbstractClient {
 			if (!this.initialized) {
 				try {
 					ApiClient client = ClientBuilder.cluster().build();
+					//ApiClient client = ClientBuilder.kubeconfig(io.kubernetes.client.util.KubeConfig
+					//		.loadKubeConfig(new java.io.FileReader("/home/medinvention/.kube/config"))).build();
 					Configuration.setDefaultApiClient(client);
 					this.initialized = true;
 				} catch (IOException e) {

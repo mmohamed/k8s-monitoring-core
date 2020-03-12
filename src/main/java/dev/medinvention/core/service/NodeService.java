@@ -14,12 +14,13 @@ import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.models.V1Node;
 import io.kubernetes.client.openapi.models.V1NodeCondition;
 import io.kubernetes.client.openapi.models.V1NodeList;
+import io.kubernetes.client.openapi.models.V1Taint;
 
 @Component
 public class NodeService extends AbstractClient {
 
 	public List<Node> get() throws ApiException {
-		
+
 		List<Node> nodes = new ArrayList<Node>();
 
 		V1NodeList list = this.getAPI().listNode(null, null, null, null, null, null, null, null, null);
@@ -42,12 +43,24 @@ public class NodeService extends AbstractClient {
 					}
 				}
 
-				Map<String, Quantity> capacity = item.getStatus().getCapacity();
+				Map<String, Quantity> capacity = item.getStatus().getAllocatable();
 
 				if (capacity != null) {
 					node.setMemory(
 							capacity.containsKey("memory") ? capacity.get("memory").getNumber() : new BigDecimal(0));
 					node.setCpu(capacity.containsKey("cpu") ? capacity.get("cpu").getNumber() : new BigDecimal(0));
+					node.setPods(capacity.containsKey("pods") ? capacity.get("pods").getNumber() : new BigDecimal(0));
+				}
+			}
+
+			if (item.getSpec() != null && item.getSpec().getTaints() != null) {
+				
+				for (V1Taint taint : item.getSpec().getTaints()) {
+					
+					if (taint.getKey().contentEquals("node-role.kubernetes.io/master")) {
+						node.setIsMaster(true);
+						break;
+					}
 				}
 			}
 

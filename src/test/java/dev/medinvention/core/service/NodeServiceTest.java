@@ -75,7 +75,7 @@ public class NodeServiceTest {
 		V1NodeStatus status = new V1NodeStatus();
 		status.addConditionsItem(condition);
 		status.addAddressesItem(addresse);
-		status.setCapacity(capacity);
+		status.setAllocatable(capacity);
 
 		V1Node node = new V1Node();
 		node.setStatus(status);
@@ -90,6 +90,6 @@ public class NodeServiceTest {
 
 		assertEquals(1, list.size());
 		assertSame("FirstNode", list.get(0).getName());
-
+		assertTrue(list.get(0).getIsMaster());
 	}
 }

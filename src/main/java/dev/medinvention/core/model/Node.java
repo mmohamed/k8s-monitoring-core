@@ -11,9 +11,13 @@ public class Node {
 	private BigDecimal cpu;
 
 	private BigDecimal memory;
-
+	
+	private BigDecimal pods;
+	
 	private String addresse;
-
+	
+	private Boolean isMaster = false;
+	
 	public String getAddresse() {
 		return addresse;
 	}
@@ -54,4 +58,20 @@ public class Node {
 		this.memory = memory;
 	}
 
+	public BigDecimal getPods() {
+		return pods;
+	}
+
+	public void setPods(BigDecimal pods) {
+		this.pods = pods;
+	}
+
+	public Boolean getIsMaster() {
+		return isMaster;
+	}
+
+	public void setIsMaster(Boolean isMaster) {
+		this.isMaster = isMaster;
+	}
+	
 }
