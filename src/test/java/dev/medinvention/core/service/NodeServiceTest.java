@@ -16,10 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import dev.medinvention.core.api.ExtendedCoreV1Api;
 import dev.medinvention.core.config.Config;
 import dev.medinvention.core.model.Node;
 import io.kubernetes.client.openapi.ApiException;
-import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1Node;
 import io.kubernetes.client.openapi.models.V1NodeAddress;
 import io.kubernetes.client.openapi.models.V1NodeCondition;
@@ -38,7 +38,7 @@ public class NodeServiceTest {
 	private NodeService nodeService;
 
 	@Mock
-	CoreV1Api api;
+	ExtendedCoreV1Api api;
 
 	@Test
 	public void testGet() throws ApiException {
